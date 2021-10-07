@@ -1,11 +1,59 @@
 {
-  "NuxtLogo": {
-    "description": "Auto imported from components/NuxtLogo.vue"
-  },
-  "Tutorial": {
-    "description": "Auto imported from components/Tutorial.vue"
+  "Logo": {
+    "description": "Auto imported from components/Logo.vue"
   },
   "VuetifyLogo": {
     "description": "Auto imported from components/VuetifyLogo.vue"
+  },
+  "FormSelectInput": {
+    "description": "Auto imported from components/form/SelectInput.vue"
+  },
+  "FormTextAreaInput": {
+    "description": "Auto imported from components/form/TextAreaInput.vue"
+  },
+  "FormTextInput": {
+    "description": "Auto imported from components/form/TextInput.vue"
+  },
+  "SharedLkpBtn": {
+    "description": "Auto imported from components/shared/LkpBtn.vue"
+  },
+  "SharedLkpCol": {
+    "description": "Auto imported from components/shared/LkpCol.vue"
+  },
+  "SharedLkpDeleteConfirmationAlert": {
+    "description": "Auto imported from components/shared/LkpDeleteConfirmationAlert.vue"
+  },
+  "SharedLkpForm": {
+    "description": "Auto imported from components/shared/LkpForm.vue"
+  },
+  "SharedLkpHeader": {
+    "description": "Auto imported from components/shared/LkpHeader.vue"
+  },
+  "SharedLkpInput": {
+    "description": "Auto imported from components/shared/LkpInput.vue"
+  },
+  "SharedLkpRow": {
+    "description": "Auto imported from components/shared/LkpRow.vue"
+  },
+  "SharedLkpSelect": {
+    "description": "Auto imported from components/shared/LkpSelect.vue"
+  },
+  "SharedLkpSideMenu": {
+    "description": "Auto imported from components/shared/LkpSideMenu.vue"
+  },
+  "SharedLkpSideMenuValidate": {
+    "description": "Auto imported from components/shared/LkpSideMenuValidate.vue"
+  },
+  "SharedLkpSnackbar": {
+    "description": "Auto imported from components/shared/LkpSnackbar.vue"
+  },
+  "SharedLkpTextField": {
+    "description": "Auto imported from components/shared/LkpTextField.vue"
+  },
+  "OffersFilter": {
+    "description": "Auto imported from components/offers/Filter.vue"
+  },
+  "OffersLkpConfirmOrder": {
+    "description": "Auto imported from components/offers/LkpConfirmOrder.vue"
   }
 }

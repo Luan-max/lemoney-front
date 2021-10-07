@@ -2,15 +2,22 @@
   {
     "name": "inspire",
     "path": "/inspire",
-    "component": "C:\\\\Users\\\\luann\\\\Downloads\\\\lemoney-frontend\\\\lemoney-front\\\\pages\\\\inspire.vue",
+    "component": "/home/luan/Luanvalidate/lemoney-front/pages/inspire.vue",
     "chunkName": "pages/inspire",
-    "_name": "_2bf54fab"
+    "_name": "_392de2fa"
+  },
+  {
+    "name": "login",
+    "path": "/login",
+    "component": "/home/luan/Luanvalidate/lemoney-front/pages/login/index.vue",
+    "chunkName": "pages/login/index",
+    "_name": "_54e09dcc"
   },
   {
     "name": "index",
     "path": "/",
-    "component": "C:\\\\Users\\\\luann\\\\Downloads\\\\lemoney-frontend\\\\lemoney-front\\\\pages\\\\index.vue",
+    "component": "/home/luan/Luanvalidate/lemoney-front/pages/index.vue",
     "chunkName": "pages/index",
-    "_name": "_492a783a"
+    "_name": "_00fddef2"
   }
 ]

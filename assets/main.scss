@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap%27");
+@import "css/sidebar";
+@import "css/table";
+@import "css/input";
+
+html {
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+h1 {
+  font-family: Noto Sans, sans-serif;
+  font-size: 1.71em;
+  font-weight: 500;
+}
+
+.v-application {
+  background-color: #efecec;
+  font-family: "Noto Sans", sans-serif !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.button-primary-linear::before {
+  background: linear-gradient(45deg, #44d289, #1fdcbd) no-repeat !important;
+  transition: background 10.3s ease-out !important;
+}
+
+.bold {
+  font-weight: 700 !important;
+}
+
+.v-sheet.v-card:not(.v-sheet--outlined) {
+  box-shadow: 0 3px 6px hsl(90deg 4% 49% / 20%) !important;
+}
+
+.text-primary {
+  color: $primary-color;
+  font-size: 0.875rem;
+}
+.v-btn:not(.v-btn--round).v-size--default {
+  height: 30px;
+  min-width: auto;
+  padding: 0 15px;
+}
+.v-select-list .theme--light.v-list-item:not(.v-list-item--active):not(.v-list-item--disabled) {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.v-input--selection-controls {
+  margin-top: 0;
+  padding-top: 0;
+}

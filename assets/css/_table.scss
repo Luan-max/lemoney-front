@@ -1,0 +1,13 @@
+.v-data-table {
+  & .v-data-table__wrapper {
+    & table {
+      & tr {
+        & td, th {
+          font-size: 13px !important;
+          height: 40px !important;
+          padding: 0 10px;
+        }
+      }
+    }
+  }
+}

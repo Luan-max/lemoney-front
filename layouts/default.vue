@@ -1,116 +1,154 @@
 <template>
   <v-app dark>
     <v-navigation-drawer
-      v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
+      :mini-variant.sync="miniVariant"
       fixed
+      permanent
+      width="160"
+      class="transition sidebar"
       app
     >
-      <v-list>
-        <v-list-item
+      <v-list class="sidebar__list">
+        <div class="cursor-pointer" @click="goToHome">
+          <div :class="[miniVariant ? 'text-center': 'text-right']">
+            <v-btn
+              icon
+              @click.stop="miniVariant = !miniVariant"
+            >
+              <v-icon class="sidebar__baricon toggle-icon" color="grey" size="18">
+                mdi-menu
+              </v-icon>
+            </v-btn>
+          </div>
+
+          <div class="sidebar__logo-container text-center">
+            <img :class="[miniVariant ? 'sidebar__logo--inactive': 'sidebar__logo--active']" :src="getImage('nuvem-white')" alt="Logo" class="transition">
+            <img v-if="!miniVariant" :class="[miniVariant ? 'sidebar__logo--inactive': 'sidebar__logo--active']" :src="getImage('linkapi-white')" alt="Logo" class="transition">
+          </div>
+        </div>
+        <template
           v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
-          router
-          exact
         >
-          <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
-          </v-list-item-content>
-        </v-list-item>
+          <v-list-item
+            v-if="!item.childrens && userCanShow(item)"
+            :key="i"
+            class="sidebar__item"
+            :to="item.to"
+          >
+            <v-icon class="sidebar__list-item-icon">
+              {{ item.icon }}
+            </v-icon>
+            <v-list-item-content>
+              <v-list-item-title class="text-white" v-text="item.title" />
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-group
+            v-else-if="userCanShow(item)"
+            :key="i"
+            :prepend-icon="item.icon"
+          >
+            <template #activator>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </template>
+            <v-list-item
+              v-for="(child, index) in item.childrens"
+              :key="i + index"
+              :to="child.to"
+              class="sidebar__list"
+
+              exact
+            >
+              <v-icon class="sidebar__list-item-icon">
+                {{ child.icon }}
+              </v-icon>
+              <v-list-item-content>
+                <v-list-item-title class="text-white" v-text="child.title" />
+              </v-list-item-content>
+            </v-list-item>
+
+            <!-- <v-list-group
+              no-action
+              sub-group
+            >
+              <template #activator>
+              </template>
+            </v-list-group> -->
+          </v-list-group>
+        </template>
       </v-list>
+      <template #append>
+        <div class="pt-4 pb-4 d-flex justify-center">
+          <span class="cursor-pointer sidebar__logout" @click="logout">
+            <v-icon>
+              mdi-logout
+            </v-icon>
+
+            <span v-if="!miniVariant">Logout</span>
+          </span>
+        </div>
+      </template>
     </v-navigation-drawer>
-    <v-app-bar
-      :clipped-left="clipped"
-      fixed
-      app
-    >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-btn
-        icon
-        @click.stop="miniVariant = !miniVariant"
-      >
-        <v-icon>mdi-{{ `chevron-${miniVariant ? 'right' : 'left'}` }}</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="clipped = !clipped"
-      >
-        <v-icon>mdi-application</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="fixed = !fixed"
-      >
-        <v-icon>mdi-minus</v-icon>
-      </v-btn>
-      <v-toolbar-title v-text="title" />
-      <v-spacer />
-      <v-btn
-        icon
-        @click.stop="rightDrawer = !rightDrawer"
-      >
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
-    </v-app-bar>
     <v-main>
-      <v-container>
-        <Nuxt />
+      <v-container fluid class="pa-0 c-fill-height">
+        <nuxt />
       </v-container>
     </v-main>
-    <v-navigation-drawer
-      v-model="rightDrawer"
-      :right="right"
-      temporary
-      fixed
-    >
-      <v-list>
-        <v-list-item @click.native="right = !right">
-          <v-list-item-action>
-            <v-icon light>
-              mdi-repeat
-            </v-icon>
-          </v-list-item-action>
-          <v-list-item-title>Switch drawer (click me)</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-footer
-      :absolute="!fixed"
-      app
-    >
-      <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer>
+    <LkpSnackbar />
   </v-app>
 </template>
 
 <script>
+import LkpSnackbar from '@/components/shared/LkpSnackbar'
 export default {
+  components: {
+    LkpSnackbar
+  },
+  middleware: 'auth',
   data () {
     return {
       clipped: false,
       drawer: false,
       fixed: false,
+      userRole: false,
       items: [
         {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/'
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
+          icon: 'mdi-bitcoin',
+          title: 'Offers',
+          to: '/orders'
         }
       ],
       miniVariant: false,
-      right: true,
+      right: false,
       rightDrawer: false,
       title: 'Vuetify.js'
+    }
+  },
+  async created () {
+    const user = await this.$store.getters['auth/user']
+
+    this.userRole = user.role
+  },
+  methods: {
+    groupIsActive (group) {
+      const route = this.$route.name
+      return group.childrens.some(item => item.to === `/${route}`)
+    },
+    getImage (name) {
+      return require(`@/assets/svg/${name}.svg`)
+    },
+    async logout () {
+      this.$localStorage.remove('access_token')
+      await this.$router.push('/login')
+    },
+    async goToHome () {
+      await this.$router.push('/')
+    },
+    userCanShow (item) {
+      if (!item.roles) {
+        return true
+      }
+
+      return item.roles.includes(this.userRole)
     }
   }
 }

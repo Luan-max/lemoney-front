@@ -1,20 +1,26 @@
 import Vue from 'vue'
-
+import Vuex from 'vuex'
 import Meta from 'vue-meta'
 import ClientOnly from 'vue-client-only'
 import NoSsr from 'vue-no-ssr'
 import { createRouter } from './router.js'
 import NuxtChild from './components/nuxt-child.js'
-import NuxtError from '..\\layouts\\error.vue'
+import NuxtError from '../layouts/error.vue'
 import Nuxt from './components/nuxt.js'
 import App from './App.js'
 import { setContext, getLocation, getRouteData, normalizeError } from './utils'
+import { createStore } from './store.js'
 
 /* Plugins */
 
-import nuxt_plugin_plugin_8a6ab364 from 'nuxt_plugin_plugin_8a6ab364' // Source: .\\components\\plugin.js (mode: 'all')
-import nuxt_plugin_plugin_67816866 from 'nuxt_plugin_plugin_67816866' // Source: .\\vuetify\\plugin.js (mode: 'all')
-import nuxt_plugin_axios_6902c11e from 'nuxt_plugin_axios_6902c11e' // Source: .\\axios.js (mode: 'all')
+import nuxt_plugin_plugin_562e0256 from 'nuxt_plugin_plugin_562e0256' // Source: ./components/plugin.js (mode: 'all')
+import nuxt_plugin_plugin_2e225158 from 'nuxt_plugin_plugin_2e225158' // Source: ./vuetify/plugin.js (mode: 'all')
+import nuxt_plugin_axios_419f0328 from 'nuxt_plugin_axios_419f0328' // Source: ./axios.js (mode: 'all')
+import nuxt_plugin_notifier_3e43155b from 'nuxt_plugin_notifier_3e43155b' // Source: ../plugins/notifier.js (mode: 'all')
+import nuxt_plugin_lemoneycomponents_afeeedf6 from 'nuxt_plugin_lemoneycomponents_afeeedf6' // Source: ../plugins/lemoney-components.js (mode: 'all')
+import nuxt_plugin_storage_8a363cdc from 'nuxt_plugin_storage_8a363cdc' // Source: ../plugins/storage.js (mode: 'all')
+import nuxt_plugin_index_3ba572a0 from 'nuxt_plugin_index_3ba572a0' // Source: ../plugins/api/index.js (mode: 'all')
+import nuxt_plugin_acl_79bdafba from 'nuxt_plugin_acl_79bdafba' // Source: ../plugins/acl.js (mode: 'all')
 
 // Component: <ClientOnly>
 Vue.component(ClientOnly.name, ClientOnly)
@@ -56,16 +62,32 @@ Vue.use(Meta, {"keyName":"head","attribute":"data-n-head","ssrAttribute":"data-n
 
 const defaultTransition = {"name":"page","mode":"out-in","appear":true,"appearClass":"appear","appearActiveClass":"appear-active","appearToClass":"appear-to"}
 
+const originalRegisterModule = Vuex.Store.prototype.registerModule
+
+function registerModule (path, rawModule, options = {}) {
+  const preserveState = process.client && (
+    Array.isArray(path)
+      ? !!path.reduce((namespacedState, path) => namespacedState && namespacedState[path], this.state)
+      : path in this.state
+  )
+  return originalRegisterModule.call(this, path, rawModule, { preserveState, ...options })
+}
+
 async function createApp(ssrContext, config = {}) {
   const router = await createRouter(ssrContext, config)
+
+  const store = createStore(ssrContext)
+  // Add this.$router into store actions/mutations
+  store.$router = router
 
   // Create Root instance
 
   // here we inject the router and store to all child components,
   // making them available everywhere as `this.$router` and `this.$store`.
   const app = {
-    head: {"titleTemplate":"%s - lemoney-front","title":"lemoney-front","htmlAttrs":{"lang":"en"},"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"hid":"description","name":"description","content":""},{"name":"format-detection","content":"telephone=no"}],"link":[{"rel":"icon","type":"image\u002Fx-icon","href":"\u002Ffavicon.ico"},{"rel":"stylesheet","type":"text\u002Fcss","href":"https:\u002F\u002Ffonts.googleapis.com\u002Fcss?family=Roboto:100,300,400,500,700,900&display=swap"},{"rel":"stylesheet","type":"text\u002Fcss","href":"https:\u002F\u002Fcdn.jsdelivr.net\u002Fnpm\u002F@mdi\u002Ffont@latest\u002Fcss\u002Fmaterialdesignicons.min.css"}],"style":[],"script":[]},
+    head: {"titleTemplate":"","title":"Lemoney front","htmlAttrs":{"lang":"en"},"meta":[{"charset":"utf-8"},{"name":"viewport","content":"width=device-width, initial-scale=1"},{"hid":"description","name":"description","content":""}],"link":[{"rel":"icon","type":"image\u002Fx-icon","href":"\u002Ffavicon.ico"},{"rel":"stylesheet","type":"text\u002Fcss","href":"https:\u002F\u002Ffonts.googleapis.com\u002Fcss?family=Roboto:100,300,400,500,700,900&display=swap"},{"rel":"stylesheet","type":"text\u002Fcss","href":"https:\u002F\u002Fcdn.jsdelivr.net\u002Fnpm\u002F@mdi\u002Ffont@latest\u002Fcss\u002Fmaterialdesignicons.min.css"}],"style":[],"script":[]},
 
+    store,
     router,
     nuxt: {
       defaultTransition,
@@ -110,6 +132,9 @@ async function createApp(ssrContext, config = {}) {
     ...App
   }
 
+  // Make app available into store via this.app
+  store.app = app
+
   const next = ssrContext ? ssrContext.next : location => app.router.push(location)
   // Resolve route
   let route
@@ -122,6 +147,7 @@ async function createApp(ssrContext, config = {}) {
 
   // Set context to app.context
   await setContext(app, {
+    store,
     route,
     next,
     error: app.nuxt.error.bind(app),
@@ -148,6 +174,9 @@ async function createApp(ssrContext, config = {}) {
       app.context[key] = value
     }
 
+    // Add into store
+    store[key] = app[key]
+
     // Check if plugin not already installed
     const installKey = '__nuxt_' + key + '_installed__'
     if (Vue[installKey]) {
@@ -169,6 +198,13 @@ async function createApp(ssrContext, config = {}) {
   // Inject runtime config as $config
   inject('config', config)
 
+  if (process.client) {
+    // Replace store state before plugins execution
+    if (window.__NUXT__ && window.__NUXT__.state) {
+      store.replaceState(window.__NUXT__.state)
+    }
+  }
+
   // Add enablePreview(previewData = {}) in context for plugins
   if (process.static && process.client) {
     app.context.enablePreview = function (previewData = {}) {
@@ -178,16 +214,36 @@ async function createApp(ssrContext, config = {}) {
   }
   // Plugin execution
 
-  if (typeof nuxt_plugin_plugin_8a6ab364 === 'function') {
-    await nuxt_plugin_plugin_8a6ab364(app.context, inject)
+  if (typeof nuxt_plugin_plugin_562e0256 === 'function') {
+    await nuxt_plugin_plugin_562e0256(app.context, inject)
   }
 
-  if (typeof nuxt_plugin_plugin_67816866 === 'function') {
-    await nuxt_plugin_plugin_67816866(app.context, inject)
+  if (typeof nuxt_plugin_plugin_2e225158 === 'function') {
+    await nuxt_plugin_plugin_2e225158(app.context, inject)
   }
 
-  if (typeof nuxt_plugin_axios_6902c11e === 'function') {
-    await nuxt_plugin_axios_6902c11e(app.context, inject)
+  if (typeof nuxt_plugin_axios_419f0328 === 'function') {
+    await nuxt_plugin_axios_419f0328(app.context, inject)
+  }
+
+  if (typeof nuxt_plugin_notifier_3e43155b === 'function') {
+    await nuxt_plugin_notifier_3e43155b(app.context, inject)
+  }
+
+  if (typeof nuxt_plugin_lemoneycomponents_afeeedf6 === 'function') {
+    await nuxt_plugin_lemoneycomponents_afeeedf6(app.context, inject)
+  }
+
+  if (typeof nuxt_plugin_storage_8a363cdc === 'function') {
+    await nuxt_plugin_storage_8a363cdc(app.context, inject)
+  }
+
+  if (typeof nuxt_plugin_index_3ba572a0 === 'function') {
+    await nuxt_plugin_index_3ba572a0(app.context, inject)
+  }
+
+  if (typeof nuxt_plugin_acl_79bdafba === 'function') {
+    await nuxt_plugin_acl_79bdafba(app.context, inject)
   }
 
   // Lock enablePreview in context
@@ -226,6 +282,7 @@ async function createApp(ssrContext, config = {}) {
   })
 
   return {
+    store,
     app,
     router
   }
