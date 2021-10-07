@@ -1,0 +1,16 @@
+[
+  {
+    "name": "inspire",
+    "path": "/inspire",
+    "component": "C:\\\\Users\\\\luann\\\\Downloads\\\\lemoney-frontend\\\\lemoney-front\\\\pages\\\\inspire.vue",
+    "chunkName": "pages/inspire",
+    "_name": "_2bf54fab"
+  },
+  {
+    "name": "index",
+    "path": "/",
+    "component": "C:\\\\Users\\\\luann\\\\Downloads\\\\lemoney-frontend\\\\lemoney-front\\\\pages\\\\index.vue",
+    "chunkName": "pages/index",
+    "_name": "_492a783a"
+  }
+]
